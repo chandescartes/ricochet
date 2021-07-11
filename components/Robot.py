@@ -9,13 +9,22 @@ class RobotType(Enum):
     WHITE = 4
 
 class Robot:
-    def __init__(self, type):
+    def __init__(self, type, row=None, col=None):
         self.type = type
-        self.row = None
-        self.col = None
+        self.row = row
+        self.col = col
 
     def __str__(self):
-        return f'{self.type}'
+        if self.type == RobotType.RED:
+            return 'R'
+        if self.type == RobotType.GREEN:
+            return 'G'
+        if self.type == RobotType.BLUE:
+            return 'B'
+        if self.type == RobotType.YELLOW:
+            return 'Y'
+        if self.type == RobotType.WHITE:
+            return 'W'
 
     def get_position(self):
         return self.row, self.col
