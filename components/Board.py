@@ -11,16 +11,7 @@ class WallType(Enum):
 class Board:
     def __init__(self, size=16):
         self.size = size
-        self.initialize_board()
-
-    def initialize_board(self):
-        self.create_board()
-        self.set_walls()
-
-    def get_tile(self, row, col):
-        return self.board[row][col]
-
-    def create_board(self):
+        self.target_positions = []
         self.board = [
             [
                 Tile(
@@ -33,10 +24,10 @@ class Board:
             ] for r in range(self.size)
         ]
 
-    def set_walls(self):
-        up_walls = [(2, 1), (2, 6), (2, 9), (2, 14), (5, 6), (5, 10), (5, 15), (6, 0), (6, 12), (7, 7), (7, 8), (9, 7), (9, 8), (10, 4), (10, 6), (10, 15), (11, 0), (11, 13), (11, 8), (12, 7), (13, 1), (14, 9), (14, 14), (15, 3)]
-        right_walls = [(0, 4), (0, 10), (1, 6), (1, 8), (2, 0), (2, 14), (4, 10), (5, 6), (6, 2), (6, 11), (7, 6), (7, 8), (8, 6), (8, 8), (9, 3), (10, 5), (10, 8), (11, 12), (12, 7), (13, 1), (13, 8), (14, 3), (14, 14), (15, 4), (15, 11)]
+    def get_tile(self, row, col):
+        return self.board[row][col]
 
+    def set_walls(self, up_walls, right_walls):
         for r, c in up_walls:
             tile = self.get_tile(r, c)
             tile.create_wall(WallType.UP)
@@ -84,7 +75,7 @@ class Board:
         
 class Tile:
     def __init__(
-        self, row, col,
+        self, row, col, 
         robot=None, target=None, 
         is_wall_up=False, is_wall_right=False, is_wall_down=False, is_wall_left=False
     ):
@@ -141,3 +132,9 @@ class Tile:
         self.is_wall_right = False
         self.is_wall_down = False
         self.is_wall_left = False
+
+    def set_target(self, target):
+        self.target = target
+
+    def clear_target(self):
+        self.target = None
