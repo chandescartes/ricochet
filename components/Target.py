@@ -1,4 +1,3 @@
-
 class Target:
     def __init__(self, robot_name, row, col):
         self.robot_name = robot_name

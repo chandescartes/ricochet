@@ -1,5 +1,5 @@
-
 from enum import Enum
+
 
 class Robot:
     def __init__(self, name, row=None, col=None):

@@ -1,5 +1,5 @@
-
 from enum import Enum
+
 
 class WallType(Enum):
     UP = 0
@@ -15,13 +15,16 @@ class Board:
         self.board = [
             [
                 Tile(
-                    r, c, 
+                    r,
+                    c,
                     is_wall_up=(r == 0),
                     is_wall_right=(c == self.size - 1),
                     is_wall_down=(r == self.size - 1),
                     is_wall_left=(c == 0),
-                ) for c in range(self.size)
-            ] for r in range(self.size)
+                )
+                for c in range(self.size)
+            ]
+            for r in range(self.size)
         ]
 
     def get_tile(self, row, col):
@@ -41,11 +44,11 @@ class Board:
 
             tile = self.get_tile(r, c + 1)
             tile.create_wall(WallType.LEFT)
-     
+
     def __str__(self):
         size = self.size
         board_builder = []
-        
+
         for r in range(size):
             row_builder = []
             down_wall_builder = []
@@ -55,29 +58,36 @@ class Board:
 
                 tile_string = str(tile)
                 right_wall_string = "|" if tile.is_wall(WallType.RIGHT) else " "
-                combined_string = f'{tile_string}{right_wall_string}'
+                combined_string = f"{tile_string}{right_wall_string}"
                 row_builder.append(combined_string)
-                
+
                 down_wall_string = "_" if tile.is_wall(WallType.DOWN) else " "
                 down_wall_builder.append(down_wall_string)
 
             row_string = "".join(row_builder)
-            row_string = f'|{row_string}'
+            row_string = f"|{row_string}"
             board_builder.append(row_string)
 
             down_wall_string = " ".join(down_wall_builder)
-            down_wall_string = f'|{down_wall_string}|'
+            down_wall_string = f"|{down_wall_string}|"
             board_builder.append(down_wall_string)
 
         board_string = "\n".join(board_builder)
         board_string = f' {" ".join("_" * size)} \n{board_string}'
         return board_string
-        
+
+
 class Tile:
     def __init__(
-        self, row, col, 
-        robot=None, target=None, 
-        is_wall_up=False, is_wall_right=False, is_wall_down=False, is_wall_left=False
+        self,
+        row,
+        col,
+        robot=None,
+        target=None,
+        is_wall_up=False,
+        is_wall_right=False,
+        is_wall_down=False,
+        is_wall_left=False,
     ):
         self.row = row
         self.col = col
@@ -91,11 +101,11 @@ class Tile:
         self.is_wall_left = is_wall_left
 
     def __str__(self):
-        if not self.robot is None:
+        if self.robot is not None:
             return str(self.robot)
-        if not self.target is None:
+        if self.target is not None:
             return str(self.target)
-        return '.'
+        return "."
 
     def is_wall(self, wall_type):
         if wall_type == WallType.UP:
@@ -116,7 +126,7 @@ class Tile:
             self.is_wall_down = True
         elif wall_type == WallType.LEFT:
             self.is_wall_left = True
-    
+
     def remove_wall(self, wall_type):
         if wall_type == WallType.UP:
             self.is_wall_up = False
@@ -126,7 +136,7 @@ class Tile:
             self.is_wall_down = False
         elif wall_type == WallType.LEFT:
             self.is_wall_left = False
-    
+
     def remove_walls(self):
         self.is_wall_up = False
         self.is_wall_right = False
