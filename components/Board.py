@@ -164,6 +164,16 @@ class Tile:
             self.is_wall_up + self.is_wall_right + self.is_wall_down + self.is_wall_left
         )
 
+    def is_robot(self):
+        return self.robot is not None
+
+    def set_robot(self, robot):
+        assert not self.is_hole, f"Cannot set robot at ({self.r}, {self.c})"
+        self.robot = robot
+
+    def clear_robot(self, robot):
+        self.robot = None
+
     def set_target(self, target):
         assert self.is_hole, f"Cannot set target at ({self.r}, {self.c})"
         self.target = target
