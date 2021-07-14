@@ -1,3 +1,4 @@
+from collections import defaultdict
 from enum import Enum
 
 
@@ -8,10 +9,17 @@ class WallType(Enum):
     LEFT = 3
 
 
+class CornerType(Enum):
+    UP_RIGHT = 0
+    DOWN_RIGHT = 1
+    DOWN_LEFT = 2
+    UP_LEFT = 3
+
+
 class Board:
     def __init__(self, size=16):
         self.size = size
-        self.target_positions = []
+        self.holes = defaultdict(bool)
         self.board = [
             [
                 Tile(
@@ -30,20 +38,25 @@ class Board:
     def get_tile(self, row, col):
         return self.board[row][col]
 
+    def set_wall(self, r, c, wall_type):
+        self.get_tile(r, c).set_wall(wall_type)
+
     def set_walls(self, up_walls, right_walls):
         for r, c in up_walls:
-            tile = self.get_tile(r, c)
-            tile.create_wall(WallType.UP)
-
-            tile = self.get_tile(r - 1, c)
-            tile.create_wall(WallType.DOWN)
+            self.set_wall(r, c, WallType.UP)
+            self.set_wall(r - 1, c, WallType.DOWN)
 
         for r, c in right_walls:
-            tile = self.get_tile(r, c)
-            tile.create_wall(WallType.RIGHT)
+            self.set_wall(r, c, WallType.RIGHT)
+            self.set_wall(r, c + 1, WallType.LEFT)
 
-            tile = self.get_tile(r, c + 1)
-            tile.create_wall(WallType.LEFT)
+    def set_hole(self, r, c):
+        self.get_tile(r, c).set_hole()
+        self.holes[r, c] = True
+
+    def set_holes(self, holes):
+        for r, c in holes:
+            self.set_hole(r, c)
 
     def __str__(self):
         size = self.size
@@ -88,6 +101,7 @@ class Tile:
         is_wall_right=False,
         is_wall_down=False,
         is_wall_left=False,
+        is_hole=False,
     ):
         self.row = row
         self.col = col
@@ -99,6 +113,8 @@ class Tile:
         self.is_wall_right = is_wall_right
         self.is_wall_down = is_wall_down
         self.is_wall_left = is_wall_left
+
+        self.is_hole = is_hole
 
     def __str__(self):
         if self.robot is not None:
@@ -117,7 +133,7 @@ class Tile:
         if wall_type == WallType.LEFT:
             return self.is_wall_left
 
-    def create_wall(self, wall_type):
+    def set_wall(self, wall_type):
         if wall_type == WallType.UP:
             self.is_wall_up = True
         elif wall_type == WallType.RIGHT:
@@ -127,7 +143,7 @@ class Tile:
         elif wall_type == WallType.LEFT:
             self.is_wall_left = True
 
-    def remove_wall(self, wall_type):
+    def clear_wall(self, wall_type):
         if wall_type == WallType.UP:
             self.is_wall_up = False
         elif wall_type == WallType.RIGHT:
@@ -137,14 +153,27 @@ class Tile:
         elif wall_type == WallType.LEFT:
             self.is_wall_left = False
 
-    def remove_walls(self):
+    def clear_walls(self):
         self.is_wall_up = False
         self.is_wall_right = False
         self.is_wall_down = False
         self.is_wall_left = False
 
+    def get_wall_count(self):
+        return sum(
+            self.is_wall_up + self.is_wall_right + self.is_wall_down + self.is_wall_left
+        )
+
     def set_target(self, target):
+        assert self.is_hole, f"Cannot set target at ({self.r}, {self.c})"
         self.target = target
 
     def clear_target(self):
         self.target = None
+
+    def set_hole(self):
+        assert self.get_wall_count() >= 2, f"Cannot set wall at ({self.r}, {self.c})"
+        self.is_hole = True
+
+    def clear_hole(self):
+        self.is_hole = False
