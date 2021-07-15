@@ -9,13 +9,6 @@ class WallType(Enum):
     LEFT = 3
 
 
-class CornerType(Enum):
-    UP_RIGHT = 0
-    DOWN_RIGHT = 1
-    DOWN_LEFT = 2
-    UP_LEFT = 3
-
-
 class Board:
     def __init__(self, size=16):
         self.size = size
@@ -159,31 +152,32 @@ class Tile:
         self.is_wall_down = False
         self.is_wall_left = False
 
-    def get_wall_count(self):
-        return sum(
-            self.is_wall_up + self.is_wall_right + self.is_wall_down + self.is_wall_left
-        )
-
     def is_robot(self):
         return self.robot is not None
 
     def set_robot(self, robot):
-        assert not self.is_hole, f"Cannot set robot at ({self.r}, {self.c})"
         self.robot = robot
 
-    def clear_robot(self, robot):
+    def clear_robot(self):
         self.robot = None
 
     def set_target(self, target):
-        assert self.is_hole, f"Cannot set target at ({self.r}, {self.c})"
         self.target = target
 
     def clear_target(self):
         self.target = None
 
     def set_hole(self):
-        assert self.get_wall_count() >= 2, f"Cannot set wall at ({self.r}, {self.c})"
+        assert self.is_corner(), f"Cannot set wall at ({self.row}, {self.col})"
         self.is_hole = True
 
     def clear_hole(self):
         self.is_hole = False
+
+    def is_corner(self):
+        return (
+            (self.is_wall_up and self.is_wall_right)
+            or (self.is_wall_right and self.is_wall_down)
+            or (self.is_wall_down and self.is_wall_left)
+            or (self.is_wall_left and self.is_wall_up)
+        )
