@@ -34,10 +34,16 @@ class Game:
     def get_robot(self, robot_name):
         return self.robots[robot_name]
 
+    def get_robot_names(self):
+        return list(self.robots.keys())
+
     def set_robot_position(self, robot_name, r, c):
         robot = self.robots[robot_name]
-        robot.set_position(r, c)
+        prev_r, prev_c = robot.get_position()
+        if r is not None and c is not None:
+            self.board.get_tile(r, c).clear_robot()
         self.board.get_tile(r, c).set_robot(robot)
+        robot.set_position(r, c)
 
     def get_position_after_move_up(self, start_r, start_c):
         for r in range(start_r, -1, -1):
@@ -45,6 +51,7 @@ class Game:
                 r > 0 and self.board.get_tile(r - 1, start_c).is_robot()
             ):
                 return r, start_c
+        assert f"Reached end of board without hitting a wall! ({r}, {start_c})"
 
     def get_position_after_move_right(self, start_r, start_c):
         size = self.board.size
@@ -53,6 +60,7 @@ class Game:
                 c < size - 1 and self.board.get_tile(start_r, c + 1).is_robot()
             ):
                 return start_r, c
+        assert f"Reached end of board without hitting a wall! ({start_r}, {c})"
 
     def get_position_after_move_down(self, start_r, start_c):
         size = self.board.size
@@ -61,6 +69,7 @@ class Game:
                 r < size - 1 and self.board.get_tile(r + 1, start_c).is_robot()
             ):
                 return r, start_c
+        assert f"Reached end of board without hitting a wall! ({r}, {start_c})"
 
     def get_position_after_move_left(self, start_r, start_c):
         for c in range(start_c, -1, -1):
@@ -68,6 +77,7 @@ class Game:
                 c > 0 and self.board.get_tile(start_r, c - 1).is_robot()
             ):
                 return start_r, c
+        assert f"Reached end of board without hitting a wall! ({start_r}, {c})"
 
     def move_robot(self, robot_name, direction):
         robot = self.robots[robot_name]
@@ -85,3 +95,4 @@ class Game:
         self.board.get_tile(start_r, start_c).clear_robot()
         self.board.get_tile(end_r, end_c).set_robot(robot)
         robot.set_position(end_r, end_c)
+        return end_r, end_c
