@@ -6,70 +6,102 @@ from components.Board import Board
 from components.Game import DirectionType, Game
 
 
-def test_board_set_hole():
+@pytest.fixture
+def small_board():
     board = Board(size=4)
-    board.set_walls([(2, 2)], [(2, 1)])
+    up_walls = [(2, 2)]
+    right_walls = [(2, 1)]
+    board.set_walls(up_walls, right_walls)
+    return board
+
+
+@pytest.fixture
+def small_board_with_holes(small_board):
+    holes = [(0, 0), (0, 3), (2, 2)]
+    small_board.set_holes(holes)
+    return small_board
+
+
+@pytest.fixture
+def small_game(small_board_with_holes):
+    game = Game(small_board_with_holes, num_robots=2)
+    return game
+
+
+def test_board_set_hole(small_board):
+    with does_not_raise():
+        small_board.set_hole(0, 0)
+        small_board.set_hole(2, 2)
+
+    with pytest.raises(AssertionError):
+        small_board.set_hole(1, 1)
+
+    with pytest.raises(AssertionError):
+        small_board.set_hole(2, 3)
+
+
+def test_game_set_target(small_game):
+    robot, _ = small_game.get_robot_names()
 
     with does_not_raise():
-        board.set_hole(0, 0)
-        board.set_hole(0, 3)
-        board.set_hole(2, 2)
+        small_game.set_target(robot, 0, 0)
+        small_game.set_target(robot, 0, 3)
+
+    assert small_game.get_target_position() == (0, 3)
 
     with pytest.raises(AssertionError):
-        board.set_hole(0, 1)
-    with pytest.raises(AssertionError):
-        board.set_hole(2, 3)
-
-
-def test_game_set_target():
-    board = Board(size=4)
-    board.set_hole(0, 0)
-    game = Game(board)
-    robot = game.get_robot_names()[0]
-
-    with does_not_raise():
-        game.set_target(robot, 0, 0)
+        small_game.set_target(robot, 3, 3)
 
     with pytest.raises(AssertionError):
-        game.set_target(robot, 0, 3)
-        game.set_target(robot, 1, 1)
+        small_game.set_target(robot, 1, 1)
 
 
-def test_game_move_robot():
-    board = Board(size=4)
-    board.set_walls([(3, 0)], [])
+def test_game_move_robot(small_game):
+    robot_a, robot_b = small_game.get_robot_names()
 
-    game = Game(board, num_robots=2)
-    robot_a, robot_b = game.get_robot_names()
-
-    game.set_robot_position(robot_a, 0, 0)
-    r, c = game.move_robot(robot_a, DirectionType.UP)
-    assert r == 0 and c == 0
-
-    game.set_robot_position(robot_a, 0, 0)
-    r, c = game.move_robot(robot_a, DirectionType.DOWN)
-    assert r == 2 and c == 0
-
-    game.set_robot_position(robot_a, 0, 0)
-    r, c = game.move_robot(robot_a, DirectionType.RIGHT)
-    assert r == 0 and c == 3
-
-    game.set_robot_position(robot_b, 0, 2)
-    game.set_robot_position(robot_a, 0, 0)
-    r, c = game.move_robot(robot_a, DirectionType.RIGHT)
+    small_game.set_robot_position(robot_a, 2, 1)
+    r, c = small_game.move_robot(robot_a, DirectionType.UP)
     assert r == 0 and c == 1
 
+    small_game.set_robot_position(robot_a, 2, 1)
+    r, c = small_game.move_robot(robot_a, DirectionType.RIGHT)
+    assert r == 2 and c == 1
 
-def test_game_is_game_completed():
-    board = Board(size=4)
-    board.set_hole(0, 0)
+    small_game.set_robot_position(robot_a, 2, 1)
+    r, c = small_game.move_robot(robot_a, DirectionType.DOWN)
+    assert r == 3 and c == 1
 
-    game = Game(board, num_robots=1)
-    robot_a = game.get_robot_names()[0]
-    game.set_target(robot_a, 0, 0)
+    small_game.set_robot_position(robot_a, 2, 1)
+    r, c = small_game.move_robot(robot_a, DirectionType.LEFT)
+    assert r == 2 and c == 0
 
-    game.set_robot_position(robot_a, 0, 1)
-    assert not game.is_game_completed()
+    small_game.set_robot_position(robot_b, 0, 1)
+    small_game.set_robot_position(robot_a, 1, 1)
+    r, c = small_game.move_robot(robot_a, DirectionType.UP)
+    assert r == 1 and c == 1
 
-    game.set_robot_position(robot_a, 0, 0)
-    assert game.is_game_completed()
+    small_game.set_robot_position(robot_b, 1, 3)
+    small_game.set_robot_position(robot_a, 1, 1)
+    r, c = small_game.move_robot(robot_a, DirectionType.RIGHT)
+    assert r == 1 and c == 2
+
+    small_game.set_robot_position(robot_b, 3, 1)
+    small_game.set_robot_position(robot_a, 1, 1)
+    r, c = small_game.move_robot(robot_a, DirectionType.DOWN)
+    assert r == 2 and c == 1
+
+    small_game.set_robot_position(robot_b, 1, 0)
+    small_game.set_robot_position(robot_a, 1, 1)
+    r, c = small_game.move_robot(robot_a, DirectionType.LEFT)
+    assert r == 1 and c == 1
+
+
+def test_game_is_game_completed(small_game):
+    robot, _ = small_game.get_robot_names()
+    small_game.set_target(robot, 0, 0)
+
+    small_game.set_robot_position(robot, 0, 1)
+    assert not small_game.is_game_completed()
+
+    small_game.set_robot_position(robot, 0, 0)
+    assert small_game.is_game_completed()

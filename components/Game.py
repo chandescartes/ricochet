@@ -24,6 +24,11 @@ class Game:
 
         self.target = None
 
+    def get_target_position(self):
+        if not self.target:
+            return None
+        return self.target.get_position()
+
     def set_target(self, robot_name, row, col):
         self.clear_target()
         self.target = Target(robot_name, row, col)
