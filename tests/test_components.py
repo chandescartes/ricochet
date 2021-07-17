@@ -40,6 +40,22 @@ def test_board_set_hole(small_board):
         small_board.set_hole(2, 3)
 
 
+def test_invalids(small_board_with_holes):
+    small_board_with_holes.set_invalid(3, 3)
+
+    with pytest.raises(AssertionError):
+        small_board_with_holes.set_hole(3, 3)
+
+    game = Game(small_board_with_holes, num_robots=1)
+    robot = game.get_robot_names()[0]
+
+    with pytest.raises(AssertionError):
+        game.set_target(robot, 3, 3)
+
+    with pytest.raises(AssertionError):
+        game.set_robot_position(robot, 3, 3)
+
+
 def test_game_set_target(small_game):
     robot, _ = small_game.get_robot_names()
 

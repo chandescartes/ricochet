@@ -12,6 +12,7 @@ class WallType(Enum):
 class Board:
     def __init__(self, size=16):
         self.size = size
+        self.invalids = defaultdict(bool)
         self.holes = defaultdict(bool)
         self.board = [
             [
@@ -31,8 +32,8 @@ class Board:
     def get_tile(self, row, col):
         return self.board[row][col]
 
-    def set_wall(self, r, c, wall_type):
-        self.get_tile(r, c).set_wall(wall_type)
+    def set_wall(self, row, col, wall_type):
+        self.get_tile(row, col).set_wall(wall_type)
 
     def set_walls(self, up_walls, right_walls):
         for r, c in up_walls:
@@ -43,9 +44,17 @@ class Board:
             self.set_wall(r, c, WallType.RIGHT)
             self.set_wall(r, c + 1, WallType.LEFT)
 
-    def set_hole(self, r, c):
-        self.get_tile(r, c).set_hole()
-        self.holes[r, c] = True
+    def set_invalid(self, row, col):
+        self.get_tile(row, col).set_invalid()
+        self.invalids[row, col] = True
+
+    def set_invalids(self, invalids):
+        for r, c in invalids:
+            self.set_invalid(r, c)
+
+    def set_hole(self, row, col):
+        self.get_tile(row, col).set_hole()
+        self.holes[row, col] = True
 
     def set_holes(self, holes):
         for r, c in holes:
@@ -88,26 +97,28 @@ class Tile:
         self,
         row,
         col,
-        robot=None,
-        target=None,
         is_wall_up=False,
         is_wall_right=False,
         is_wall_down=False,
         is_wall_left=False,
+        is_invalid=False,
         is_hole=False,
+        robot=None,
+        target=None,
     ):
         self.row = row
         self.col = col
-
-        self.robot = robot
-        self.target = target
 
         self.is_wall_up = is_wall_up
         self.is_wall_right = is_wall_right
         self.is_wall_down = is_wall_down
         self.is_wall_left = is_wall_left
 
+        self.is_invalid = is_invalid
         self.is_hole = is_hole
+
+        self.robot = robot
+        self.target = target
 
     def __str__(self):
         if self.robot is not None:
@@ -152,10 +163,20 @@ class Tile:
         self.is_wall_down = False
         self.is_wall_left = False
 
+    def set_invalid(self):
+        self.is_invalid = True
+
+    def set_hole(self):
+        assert (
+            not self.is_invalid and self.is_corner()
+        ), f"Cannot set wall at ({self.row}, {self.col})"
+        self.is_hole = True
+
     def is_robot(self):
         return self.robot is not None
 
     def set_robot(self, robot):
+        assert not self.is_invalid, f"Cannot set robot at ({self.row}, {self.col})"
         self.robot = robot
 
     def clear_robot(self):
@@ -167,13 +188,6 @@ class Tile:
 
     def clear_target(self):
         self.target = None
-
-    def set_hole(self):
-        assert self.is_corner(), f"Cannot set wall at ({self.row}, {self.col})"
-        self.is_hole = True
-
-    def clear_hole(self):
-        self.is_hole = False
 
     def is_corner(self):
         return (
