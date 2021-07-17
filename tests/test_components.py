@@ -21,7 +21,7 @@ def test_board_set_hole():
         board.set_hole(2, 3)
 
 
-def test_move_robot():
+def test_game_move_robot():
     board = Board(size=4)
     board.set_walls([(3, 0)], [])
 
@@ -44,3 +44,18 @@ def test_move_robot():
     game.set_robot_position(robot_a, 0, 0)
     r, c = game.move_robot(robot_a, DirectionType.RIGHT)
     assert r == 0 and c == 1
+
+
+def test_game_is_game_completed():
+    board = Board(size=4)
+    board.set_hole(0, 0)
+
+    game = Game(board, num_robots=1)
+    robot_a = game.get_robot_names()[0]
+    game.set_target(robot_a, 0, 0)
+
+    game.set_robot_position(robot_a, 0, 1)
+    assert not game.is_game_completed()
+
+    game.set_robot_position(robot_a, 0, 0)
+    assert game.is_game_completed()
