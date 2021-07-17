@@ -23,6 +23,7 @@ class Game:
             self.robots[robot_name] = Robot(robot_name)
 
         self.target = None
+        self.target_robot = None
 
     def get_target_position(self):
         if not self.target:
@@ -33,14 +34,20 @@ class Game:
         self.clear_target()
         self.target = Target(robot_name, row, col)
         self.board.get_tile(row, col).set_target(self.target)
+        self.target_robot = self.robots[robot_name]
 
     def clear_target(self):
         if self.target:
             row, col = self.target.row, self.target.col
             self.board.get_tile(row, col).clear_target()
+            self.target = None
+            self.target_robot = None
 
     def get_robot_names(self):
         return list(self.robots.keys())
+
+    def get_robot_position(self, robot_name):
+        return self.robots[robot_name].get_position()
 
     def set_robot_position(self, robot_name, row, col):
         robot = self.robots[robot_name]
@@ -105,7 +112,6 @@ class Game:
     def is_game_finished(self):
         if not self.target:
             return False
-        target_robot_name = self.target.get_robot_name()
         target_row, target_col = self.target.get_position()
-        robot_row, robot_col = self.robots[target_robot_name].get_position()
+        robot_row, robot_col = self.target_robot.get_position()
         return target_row == robot_row and target_col == robot_col
