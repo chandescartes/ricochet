@@ -147,22 +147,6 @@ class Tile:
         elif wall_type == WallType.LEFT:
             self.is_wall_left = True
 
-    def clear_wall(self, wall_type):
-        if wall_type == WallType.UP:
-            self.is_wall_up = False
-        elif wall_type == WallType.RIGHT:
-            self.is_wall_right = False
-        elif wall_type == WallType.DOWN:
-            self.is_wall_down = False
-        elif wall_type == WallType.LEFT:
-            self.is_wall_left = False
-
-    def clear_walls(self):
-        self.is_wall_up = False
-        self.is_wall_right = False
-        self.is_wall_down = False
-        self.is_wall_left = False
-
     def set_invalid(self):
         self.is_invalid = True
 

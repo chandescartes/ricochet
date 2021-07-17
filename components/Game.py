@@ -39,9 +39,6 @@ class Game:
             row, col = self.target.row, self.target.col
             self.board.get_tile(row, col).clear_target()
 
-    def get_robot(self, robot_name):
-        return self.robots[robot_name]
-
     def get_robot_names(self):
         return list(self.robots.keys())
 
