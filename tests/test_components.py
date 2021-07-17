@@ -21,6 +21,20 @@ def test_board_set_hole():
         board.set_hole(2, 3)
 
 
+def test_game_set_target():
+    board = Board(size=4)
+    board.set_hole(0, 0)
+    game = Game(board)
+    robot = game.get_robot_names()[0]
+
+    with does_not_raise():
+        game.set_target(robot, 0, 0)
+
+    with pytest.raises(AssertionError):
+        game.set_target(robot, 0, 3)
+        game.set_target(robot, 1, 1)
+
+
 def test_game_move_robot():
     board = Board(size=4)
     board.set_walls([(3, 0)], [])
