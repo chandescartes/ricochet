@@ -13,3 +13,6 @@ class Target:
     def set_position(self, row, col):
         self.row = row
         self.col = col
+
+    def get_robot_name(self):
+        return self.robot_name

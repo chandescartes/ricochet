@@ -102,7 +102,10 @@ class Game:
         robot.set_position(end_r, end_c)
         return end_r, end_c
 
-    def is_game_completed(self):
-        assert self.target, "Target not set"
-        row, col = self.target.get_position()
-        return self.board.get_tile(row, col).is_robot_on_target()
+    def is_game_finished(self):
+        if not self.target:
+            return False
+        target_robot_name = self.target.get_robot_name()
+        target_row, target_col = self.target.get_position()
+        robot_row, robot_col = self.robots[target_robot_name].get_position()
+        return target_row == robot_row and target_col == robot_col

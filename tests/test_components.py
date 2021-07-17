@@ -112,12 +112,12 @@ def test_game_move_robot(small_game):
     assert r == 1 and c == 1
 
 
-def test_game_is_game_completed(small_game):
+def test_game_is_game_finished(small_game):
     robot, _ = small_game.get_robot_names()
     small_game.set_target(robot, 0, 0)
 
     small_game.set_robot_position(robot, 0, 1)
-    assert not small_game.is_game_completed()
+    assert not small_game.is_game_finished()
 
     small_game.set_robot_position(robot, 0, 0)
-    assert small_game.is_game_completed()
+    assert small_game.is_game_finished()

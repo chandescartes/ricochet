@@ -180,10 +180,3 @@ class Tile:
             or (self.is_wall_down and self.is_wall_left)
             or (self.is_wall_left and self.is_wall_up)
         )
-
-    def is_robot_on_target(self):
-        return (
-            self.robot is not None
-            and self.target is not None
-            and self.robot.name == self.target.robot_name
-        )
