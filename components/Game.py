@@ -22,9 +22,12 @@ class Game:
             robot_name = chr(65 + i)
             self.robots[robot_name] = Robot(robot_name)
 
-    def set_target(self, robot, row, col):
+        self.target = None
+
+    def set_target(self, robot_name, row, col):
         self.clear_target()
-        self.target = Target(robot.name, row, col)
+        self.target = Target(robot_name, row, col)
+        self.board.get_tile(row, col).set_target(self.target)
 
     def clear_target(self):
         if self.target:
@@ -37,13 +40,13 @@ class Game:
     def get_robot_names(self):
         return list(self.robots.keys())
 
-    def set_robot_position(self, robot_name, r, c):
+    def set_robot_position(self, robot_name, row, col):
         robot = self.robots[robot_name]
         prev_r, prev_c = robot.get_position()
-        if r is not None and c is not None:
-            self.board.get_tile(r, c).clear_robot()
-        self.board.get_tile(r, c).set_robot(robot)
-        robot.set_position(r, c)
+        if prev_r is not None and prev_c is not None:
+            self.board.get_tile(prev_r, prev_c).clear_robot()
+        self.board.get_tile(row, col).set_robot(robot)
+        robot.set_position(row, col)
 
     def get_position_after_move_up(self, start_r, start_c):
         for r in range(start_r, -1, -1):
@@ -96,3 +99,8 @@ class Game:
         self.board.get_tile(end_r, end_c).set_robot(robot)
         robot.set_position(end_r, end_c)
         return end_r, end_c
+
+    def is_game_completed(self):
+        assert self.target, "Target not set"
+        row, col = self.target.get_position()
+        return self.board.get_tile(row, col).is_robot_on_target()

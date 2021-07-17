@@ -162,6 +162,7 @@ class Tile:
         self.robot = None
 
     def set_target(self, target):
+        assert self.is_hole, f"Cannot set target at ({self.row}, {self.col})"
         self.target = target
 
     def clear_target(self):
@@ -180,4 +181,11 @@ class Tile:
             or (self.is_wall_right and self.is_wall_down)
             or (self.is_wall_down and self.is_wall_left)
             or (self.is_wall_left and self.is_wall_up)
+        )
+
+    def is_robot_on_target(self):
+        return (
+            self.robot is not None
+            and self.target is not None
+            and self.robot.name == self.target.robot_name
         )
