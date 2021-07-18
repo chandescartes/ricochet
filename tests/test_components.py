@@ -2,7 +2,6 @@ from contextlib import nullcontext as does_not_raise
 
 import pytest
 
-from components.Board import Board
 from components.Game import DirectionType, Game
 
 
