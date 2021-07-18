@@ -24,3 +24,20 @@ def small_board_with_holes(small_board):
 def small_game(small_board_with_holes):
     game = Game(small_board_with_holes, num_robots=2)
     return game
+
+
+@pytest.fixture
+def standard_game():
+    board = Board()
+    up_walls = []
+    right_walls = []
+    board.set_walls(up_walls, right_walls)
+    invalids = []
+    board.set_invalids(invalids)
+    holes = [(0, 0)]
+    board.set_holes(holes)
+
+    game = Game(board)
+    robot = game.get_robot_names()[0]
+    game.set_target(robot, *(holes[0]))
+    return game
