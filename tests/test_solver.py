@@ -1,4 +1,3 @@
-from components import Game
 from solver import encode_robot_positions
 
 
