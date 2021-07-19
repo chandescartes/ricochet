@@ -9,6 +9,7 @@ class Game:
 
         self._create_board()
         self._set_walls(up_walls, right_walls)
+        self._precompute_movement_board()
 
         self.target_position = target_position
 
@@ -42,3 +43,45 @@ class Game:
         for r, c in right_walls:
             self.board[r][c][1] = True
             self.board[r][c + 1][3] = True
+
+    def _precompute_move_up(self, row, col):
+        for r in range(row, -1, -1):
+            if self.board[r][col][0]:
+                return r, col
+        assert f"Infinite move up from ({row}, {col})!"
+
+    def _precompute_move_right(self, row, col):
+        for c in range(col, self.size):
+            if self.board[row][c][1]:
+                return row, c
+        assert f"Infinite move right from ({row}, {col})!"
+
+    def _precompute_move_down(self, row, col):
+        for r in range(row, self.size):
+            if self.board[r][col][2]:
+                return r, col
+        assert f"Infinite move down from ({row}, {col})!"
+
+    def _precompute_move_left(self, row, col):
+        for c in range(col, -1, -1):
+            if self.board[row][c][3]:
+                return row, c
+        assert f"Infinite move left from ({row}, {col})!"
+
+    def _precompute_movement_board(self):
+        """Precompute where robots will end up after move, assuming no robots present
+
+        To optimize move computation.
+        """
+        self.movement_board = [
+            [
+                (
+                    self._precompute_move_up(r, c),
+                    self._precompute_move_right(r, c),
+                    self._precompute_move_down(r, c),
+                    self._precompute_movement_board(r, c),
+                )
+                for c in range(self.size)
+            ]
+            for r in range(self.size)
+        ]
