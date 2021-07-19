@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import final
 
 
 class Game:
@@ -24,7 +25,7 @@ class Game:
         """
         self.board = [
             [
-                ((r == 0), (c == self.size - 1), (r == self.size - 1), (c == 0))
+                [(r == 0), (c == self.size - 1), (r == self.size - 1), (c == 0)]
                 for c in range(self.size)
             ]
             for r in range(self.size)
@@ -79,9 +80,37 @@ class Game:
                     self._precompute_move_up(r, c),
                     self._precompute_move_right(r, c),
                     self._precompute_move_down(r, c),
-                    self._precompute_movement_board(r, c),
+                    self._precompute_move_left(r, c),
                 )
                 for c in range(self.size)
             ]
             for r in range(self.size)
         ]
+
+    def move_up(self, row, col, other_robot_positions):
+        final_row = self.movement_board[row][col][0]
+        for r, c in other_robot_positions:
+            if c == col and final_row <= r < row:
+                final_row = r + 1
+        return final_row, col
+
+    def move_right(self, row, col, other_robot_positions):
+        final_col = self.movement_board[row][col][1]
+        for r, c in other_robot_positions:
+            if r == row and col < c <= final_col:
+                final_col = c - 1
+        return row, final_col
+
+    def move_down(self, row, col, other_robot_positions):
+        final_row = self.movement_board[row][col][2]
+        for r, c in other_robot_positions:
+            if c == col and row < r <= final_row:
+                final_row = r - 1
+        return final_row, col
+
+    def move_left(self, row, col, other_robot_positions):
+        final_col = self.movement_board[row][col][3]
+        for r, c in other_robot_positions:
+            if r == row and final_col <= c < col:
+                final_col = c + 1
+        return row, final_col
