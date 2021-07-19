@@ -5,12 +5,12 @@ def solve(game):
     pass
 
 
-def encode_robot_positions(game):
-    target_position = game.target_robot.get_position()
-    other_positions = (
-        game.get_robot_position(robot_name)
-        for robot_name in game.get_robot_names()
-        if robot_name != game.target_robot.name
-    )
-    other_positions = sorted(other_positions)
-    return (target_position, *other_positions)
+def encode_robot_positions(robot_positions):
+    """Return a hashable encoding given robot positions
+
+    The first position is the target robot's position, which should be distinguished.
+    The positions of other robots are sorted to produce the same encoding.
+    """
+    target_position = robot_positions[0]
+    other_positions = robot_positions[1:]
+    return (target_position, *sorted(other_positions))
