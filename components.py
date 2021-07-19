@@ -47,25 +47,25 @@ class Game:
     def _precompute_move_up(self, row, col):
         for r in range(row, -1, -1):
             if self.board[r][col][0]:
-                return r, col
+                return r
         assert f"Infinite move up from ({row}, {col})!"
 
     def _precompute_move_right(self, row, col):
         for c in range(col, self.size):
             if self.board[row][c][1]:
-                return row, c
+                return c
         assert f"Infinite move right from ({row}, {col})!"
 
     def _precompute_move_down(self, row, col):
         for r in range(row, self.size):
             if self.board[r][col][2]:
-                return r, col
+                return r
         assert f"Infinite move down from ({row}, {col})!"
 
     def _precompute_move_left(self, row, col):
         for c in range(col, -1, -1):
             if self.board[row][c][3]:
-                return row, c
+                return c
         assert f"Infinite move left from ({row}, {col})!"
 
     def _precompute_movement_board(self):
