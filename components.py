@@ -1,5 +1,11 @@
 from enum import Enum
-from typing import final
+
+
+class Direction(Enum):
+    UP = 0
+    RIGHT = 1
+    DOWN = 2
+    LEFT = 3
 
 
 class Game:
@@ -87,30 +93,45 @@ class Game:
             for r in range(self.size)
         ]
 
-    def move_up(self, row, col, other_robot_positions):
+    def _move_robot_up(self, row, col, other_robot_positions):
         final_row = self.movement_board[row][col][0]
         for r, c in other_robot_positions:
             if c == col and final_row <= r < row:
                 final_row = r + 1
         return final_row, col
 
-    def move_right(self, row, col, other_robot_positions):
+    def _move_robot_right(self, row, col, other_robot_positions):
         final_col = self.movement_board[row][col][1]
         for r, c in other_robot_positions:
             if r == row and col < c <= final_col:
                 final_col = c - 1
         return row, final_col
 
-    def move_down(self, row, col, other_robot_positions):
+    def _move_robot_down(self, row, col, other_robot_positions):
         final_row = self.movement_board[row][col][2]
         for r, c in other_robot_positions:
             if c == col and row < r <= final_row:
                 final_row = r - 1
         return final_row, col
 
-    def move_left(self, row, col, other_robot_positions):
+    def _move_robot_left(self, row, col, other_robot_positions):
         final_col = self.movement_board[row][col][3]
         for r, c in other_robot_positions:
             if r == row and final_col <= c < col:
                 final_col = c + 1
         return row, final_col
+
+    def move_robot(self, direction, row, col, other_robot_positions):
+        if direction == Direction.UP:
+            return self._move_robot_up(row, col, other_robot_positions)
+
+        if direction == Direction.RIGHT:
+            return self._move_robot_right(row, col, other_robot_positions)
+
+        if direction == Direction.DOWN:
+            return self._move_robot_down(row, col, other_robot_positions)
+
+        if direction == Direction.LEFT:
+            return self._move_robot_left(row, col, other_robot_positions)
+
+        raise AssertionError(f"Invalid direction {direction} 🚫")
