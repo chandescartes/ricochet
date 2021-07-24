@@ -1,3 +1,4 @@
+from collections import deque
 from enum import Enum
 
 
@@ -135,3 +136,57 @@ class Game:
             return self._move_robot_left(row, col, other_robot_positions)
 
         raise AssertionError(f"Invalid direction {direction} 🚫")
+
+    @staticmethod
+    def encode_robot_positions(robot_positions):
+        """Return a hashable encoding given robot positions
+
+        The first position is the target robot's position, which should be distinguished.
+        The positions of other robots are sorted to produce the same encoding.
+        """
+        target_position = robot_positions[0]
+        other_positions = robot_positions[1:]
+        return (target_position, *sorted(other_positions))
+
+    def solve(self):
+        """Returns an optimal solution of the game
+
+        Implemented using BFS.
+        TODO: Try implementing using A* algorithm and test if faster
+        TODO: Return all optimal solutions (currently returns first one it finds)
+        """
+        target_position = self.target_position
+        initial_robot_positions = self.initial_robot_positions
+        initial_encoding = self.encode_robot_positions(initial_robot_positions)
+
+        queue = deque([(initial_robot_positions, initial_encoding, 0)])
+        seen = {initial_encoding: None}
+
+        while queue:
+            robot_positions, encoding, num_moves = queue.popleft()
+
+            if num_moves > 20:
+                # Deem games of over 20 moves to be too complicated.
+                raise AssertionError("Failed to solve 🤯")
+
+            target_robot_position = robot_positions[0]
+            if target_robot_position == target_position:
+                return num_moves
+
+            for i, (row, col) in enumerate(robot_positions):
+                other_robot_positions = robot_positions[:i] + robot_positions[i + 1 :]
+
+                for d in Direction:
+                    new_position = self.move_robot(d, row, col, other_robot_positions)
+                    new_robot_positions = (
+                        robot_positions[:i] + [new_position] + robot_positions[i + 1 :]
+                    )
+                    new_encoding = self.encode_robot_positions(new_robot_positions)
+
+                    if new_encoding not in seen:
+                        queue.append((new_robot_positions, new_encoding, num_moves + 1))
+                        seen[new_encoding] = encoding
+
+        raise AssertionError(
+            "We somehow exhausted the queue before finding a solution 🤔"
+        )
