@@ -70,3 +70,21 @@ def test_solve_mini(mini_game):
 
     mini_game.target_position = (3, 2)
     assert mini_game.solve() == 3
+
+
+def test_solve_standard(standard_game):
+    standard_game.initial_robot_positions = [(12, 11), (4, 2), (5, 8), (7, 14)]
+    standard_game.target_position = (9, 13)
+    assert standard_game.solve() == 9
+
+    standard_game.initial_robot_positions = [(4, 2), (12, 11), (5, 8), (7, 14)]
+    standard_game.target_position = (13, 5)
+    assert standard_game.solve() == 5
+
+    standard_game.initial_robot_positions = [(5, 8), (4, 2), (12, 11), (7, 14)]
+    standard_game.target_position = (3, 6)
+    assert standard_game.solve() == 4
+
+    standard_game.initial_robot_positions = [(7, 14), (4, 2), (12, 11), (5, 8)]
+    standard_game.target_position = (14, 10)
+    assert standard_game.solve() == 4
