@@ -24,6 +24,8 @@ class Game:
         # First index is position of the target robot, the rest are other robots' positions.
         self.initial_robot_positions = initial_robot_positions
 
+        self.solution = None
+
     def _create_board(self):
         """Creates a board with boundary walls
 
@@ -148,6 +150,18 @@ class Game:
         other_positions = robot_positions[1:]
         return (target_position, *sorted(other_positions))
 
+    def _get_solution_moves(self, solution_encoding, seen):
+        moves = []
+
+        encoding = solution_encoding
+        while seen[encoding] is not None:
+            robot, direction, prev_encoding = seen[encoding]
+            moves.append((robot, direction))
+            encoding = prev_encoding
+
+        moves.reverse()
+        return moves
+
     def solve(self):
         """Returns an optimal solution of the game
 
@@ -171,6 +185,8 @@ class Game:
 
             target_robot_position = robot_positions[0]
             if target_robot_position == target_position:
+                self.solution = self._get_solution_moves(encoding, seen)
+                assert len(self.solution) == num_moves, "Incorrect solution moves"
                 return num_moves
 
             for i, (row, col) in enumerate(robot_positions):
@@ -185,7 +201,7 @@ class Game:
 
                     if new_encoding not in seen:
                         queue.append((new_robot_positions, new_encoding, num_moves + 1))
-                        seen[new_encoding] = encoding
+                        seen[new_encoding] = (i, d, encoding)
 
         raise AssertionError(
             "We somehow exhausted the queue before finding a solution 🤔"
